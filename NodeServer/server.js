@@ -27,12 +27,11 @@ app.post('/api/saveSellerData', (req, res) => {
           res.status(500).json({ error: 'Error parsing data' });
           return;
         }
-  
         // Add the new form data to the existing array
         sellerData.push(formData);
   
         // Save the updated data to the file
-        fs.writeFile('SellerData.json', JSON.stringify(sellerData), (writeErr) => {
+        fs.writeFile('RegistrationData.json', JSON.stringify(sellerData), (writeErr) => {
           if (writeErr) {
             console.error('Error saving data:', writeErr);
             res.status(500).json({ error: 'Error saving data' });
@@ -45,7 +44,36 @@ app.post('/api/saveSellerData', (req, res) => {
     });
   });
   
-  
+
+  // Endpoint for login
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+
+  // Read the registration data from the JSON file
+  fs.readFile('RegistrationData.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading registration data:', err);
+      return res.status(500).json({ error: 'An error occurred' });
+    }
+
+    try {
+      const registrationData = JSON.parse(data);
+      const user = registrationData.find((user) => user.email == email && user.password == password);
+
+      if (user) {
+        // User found, return the user's role
+        res.json({ role: user.role });
+      } else {
+        // User not found or invalid credentials
+        res.status(401).json({ error: 'Invalid credentials' });
+      }
+    } catch (error) {
+      console.error('Error parsing registration data:', error);
+      res.status(500).json({ error: 'An error occurred' });
+    }
+  });
+});
+
   app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
