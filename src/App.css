@@ -1,0 +1,31 @@
+
+/* Custom CSS */
+.header {
+  padding: 10px;
+  margin-top: 10px;
+  text-align: center;
+  background: #879dff;
+  color: white;
+  font-size: 28px;
+}
+.form-group {
+  max-width: 400px; /* Reduce the width of the form fields */
+  margin-top: 10px; /* Center the form fields */
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.btn-register {
+margin-top: 10px; /* Add margin to the top of the Register button */
+margin-left: 765px;
+margin-bottom: 10px;
+}
+.error-message {
+  color: red;
+  font-size: 14px;
+}
+
+.Margin{
+  margin-top: 600px; /* Add margin to the top of the Register button */
+ 
+}
