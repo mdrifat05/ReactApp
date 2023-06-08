@@ -14,6 +14,7 @@ function SellerRegistration() {
     phone: '',
     address: '',
     joined: '',
+    role: 'seller',
   });
 
 const [formErrors, setErrors] = useState({});
@@ -34,7 +35,6 @@ const [isSubmit, setIsSubmit] = useState(false);
       });
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors(validate(formData));
@@ -69,7 +69,6 @@ const [isSubmit, setIsSubmit] = useState(false);
       registerUser();
     }
   }, [formErrors]);
-  
   
     const validate = (values)=>{
     const errors = {};
@@ -112,7 +111,6 @@ const [isSubmit, setIsSubmit] = useState(false);
     }
     return errors; 
 }
-
   return (
     <div>
       <div className="container"> 

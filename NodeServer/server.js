@@ -12,7 +12,7 @@ app.post('/api/saveSellerData', (req, res) => {
     const formData = req.body;
   
     // Read existing data from the file
-    fs.readFile('SellerData.json', 'utf8', (err, data) => {
+    fs.readFile('RegistrationData.json', 'utf8', (err, data) => {
       if (err) {
         console.error('Error reading data:', err);
         res.status(500).json({ error: 'Error reading data' });
@@ -46,6 +46,6 @@ app.post('/api/saveSellerData', (req, res) => {
   });
   
   
-app.listen(port, () => {
+  app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
