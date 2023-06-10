@@ -21,8 +21,11 @@ function NavBar() {
         setIsLoggedIn(true);
         setUserEmail(customerEmail);
         setUserRole('customer');
-      } else if (location.pathname !== '/Login') {
-        // Redirect to the login page if no email exists and not on the login page
+      } else if (
+        location.pathname !== '/Login' &&
+        location.pathname !== '/SellerRegistration'
+      ) {
+        // Redirect to the login page if no email exists and not on the login or registration page
         window.location.href = '/Login';
       }
     }
