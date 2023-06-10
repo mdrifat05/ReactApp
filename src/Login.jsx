@@ -37,7 +37,7 @@ function LoginPage() {
           window.location.href = '/SellerDashboard'; // Redirect to the seller dashboard
         } else if (userRole === 'customer') {
           localStorage.setItem('LoggedCustomerEmail', email);
-          window.location.href = '/customer-dashboard'; // Redirect to the admin dashboard
+          window.location.href = '/CustomerDashboard'; // Redirect to the admin dashboard
         } else {
           // Handle other roles or show an error message
           console.error('Invalid user role:', userRole);

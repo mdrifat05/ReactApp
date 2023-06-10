@@ -37,11 +37,34 @@ function NavBar() {
     window.location.href = '/Login'; // Redirect to the login page after logout
   };
 
+  const renderHomeButton = () => {
+    if (isLoggedIn) {
+      if (userRole === 'seller') {
+        return (
+          <li className="nav-item active">
+            <Link to="/SellerDashboard" className="nav-link">
+              Home
+            </Link>
+          </li>
+        );
+      } else {
+        return (
+          <li className="nav-item active">
+            <Link to="/CustomerDashboard" className="nav-link">
+              Home
+            </Link>
+          </li>
+        );
+      }
+    }
+    return null;
+  };
+
   return (
     <>
       {/* Navbar */}
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a className="navbar-brand" href="#">
+        <a className="navbar-brand" href="/">
           Rifats Book Store
         </a>
         <button
@@ -57,11 +80,7 @@ function NavBar() {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ml-auto">
-            <li className="nav-item active">
-              <Link to="/Home" className="nav-link">
-                Home
-              </Link>
-            </li>
+            {renderHomeButton()}
             {!isLoggedIn && (
               <>
                 <li className="nav-item">
@@ -78,6 +97,13 @@ function NavBar() {
             )}
             {isLoggedIn && (
               <>
+                {userRole === 'seller' && (
+                  <li className="nav-item">
+                    <Link to="/AddBook" className="nav-link">
+                      Add Book
+                    </Link>
+                  </li>
+                )}
                 <li className="nav-item">
                   <Link to={`/${userRole}-profile`} className="nav-link">
                     {userRole === 'seller' ? 'Seller Profile' : 'Customer Profile'}
