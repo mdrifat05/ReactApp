@@ -8,10 +8,10 @@ function LoginPage() {
     const password = document.getElementById('password').value;
 
     try {
-      // Perform login logic asynchronously
-      console.log('Performing login...');
-      // Simulating an API call with a delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // // Perform login logic asynchronously
+      // console.log('Performing login...');
+      // // Simulating an API call with a delay
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Make API call for authentication and retrieving user's role
       const response = await fetch('http://localhost:3000/api/login', {
@@ -33,8 +33,10 @@ function LoginPage() {
 
         // Redirect the user based on their role
         if (userRole === 'seller') {
-          window.location.href = '/seller-dashboard'; // Redirect to the seller dashboard
+          localStorage.setItem('LoggedSellerEmail', email);
+          window.location.href = '/SellerDashboard'; // Redirect to the seller dashboard
         } else if (userRole === 'customer') {
+          localStorage.setItem('LoggedCustomerEmail', email);
           window.location.href = '/customer-dashboard'; // Redirect to the admin dashboard
         } else {
           // Handle other roles or show an error message

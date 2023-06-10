@@ -55,11 +55,10 @@ app.post('/api/login', (req, res) => {
       console.error('Error reading registration data:', err);
       return res.status(500).json({ error: 'An error occurred' });
     }
-
+    
     try {
       const registrationData = JSON.parse(data);
       const user = registrationData.find((user) => user.email == email && user.password == password);
-
       if (user) {
         // User found, return the user's role
         res.json({ role: user.role });
