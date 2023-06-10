@@ -79,12 +79,15 @@ function AddBooks() {
   const validateForm = (values) => {
     const errors = {};
 
-    if (!values.title.trim() && values.title.length > 2) {
+    if (!values.title.trim()) {
       errors.title = 'Title cannot be empty';
+    }else if (values.title.length < 2) {
+        errors.title = 'Title must be at least 2 characters';
     }
-
-    if (!values.author.trim() && values.author.length > 2) {
+    if (!values.author.trim()) {
       errors.author = 'Author Name required';
+    }else if(values.title.length < 2){
+        errors.author = 'Author Name must be at least 2 characters';
     }
 
     if (!values.genre) {
