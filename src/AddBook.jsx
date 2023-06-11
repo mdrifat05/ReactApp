@@ -3,6 +3,8 @@ import './App.css';
 import { useNavigate } from 'react-router-dom';
 
 function AddBooks() {
+  //get local storage loggedSellerEmail
+  const sellerEmail = localStorage.getItem('LoggedSellerEmail'); 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     id: Math.floor(Math.random() * 10000),
@@ -12,6 +14,7 @@ function AddBooks() {
     price: '',
     description: '',
     quantity: '',
+    sellerEmail: sellerEmail,
   });
 
   const [formErrors, setErrors] = useState({});

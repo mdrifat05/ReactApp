@@ -1,52 +1,121 @@
-import React from 'react';
-import { useState } from 'react';
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function SellerBookList() {
   const [selectedBooks, setSelectedBooks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleCheckboxChange = (bookId) => {
-    setSelectedBooks((prevSelectedBooks) => {
-      if (prevSelectedBooks.includes(bookId)) {
-        return prevSelectedBooks.filter((id) => id !== bookId);
+    if (bookId === "all") {
+      if (selectedBooks.length === books.length) {
+        setSelectedBooks([]);
       } else {
-        return [...prevSelectedBooks, bookId];
+        const allBookIds = books.map((book) => book.id);
+        setSelectedBooks(allBookIds);
       }
-    });
+    } else {
+      setSelectedBooks((prevSelectedBooks) => {
+        if (prevSelectedBooks.includes(bookId)) {
+          return prevSelectedBooks.filter((id) => id !== bookId);
+        } else {
+          return [...prevSelectedBooks, bookId];
+        }
+      });
+    }
   };
 
-  const handleDeleteSelected = () => {
-    // Implement the logic for deleting selected books based on the selectedBooks state
-    console.log('Selected Books:', selectedBooks);
+  const handleDeleteSelected = async () => {
+    try {
+      // Send a DELETE request to the backend API with the selected book IDs
+      const response = await fetch("http://localhost:3000/api/books", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookIds: selectedBooks }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete books.");
+      }
+  
+      // Update the books state by filtering out the deleted books
+      setBooks((prevBooks) =>
+        prevBooks.filter((book) => !selectedBooks.includes(book.id))
+      );
+  
+      // Clear the selectedBooks state
+      setSelectedBooks([]);
+    } catch (error) {
+      console.error("Error deleting books:", error);
+      setError("Failed to delete books. Please try again later.");
+    }
   };
+  
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-    // Implement search functionality according to your requirements
-    // You can filter and update the book list based on the search query
   };
+
+  const handleEditClick = (bookId) => {
+    console.log("Edit clicked for book ID:", bookId);
+    // Implement the logic for handling the Edit action for the respective book
+  };
+
+  useEffect(() => {
+    // Fetch the book data from the backend API
+    const fetchBooks = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/books?sellerEmail=${localStorage.LoggedSellerEmail}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch books.");
+        }
+
+        const data = await response.json();
+        setBooks(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+        setError("Failed to fetch books. Please try again later.");
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="container mt-4">
-      <div className="row">
-        <div className="col-md-6">
-          <h1>Books</h1>
-        </div>
+      <div className="Delete">
+        <h1>Books</h1>
       </div>
-      <div className="row">
-        <div className="col-md-6">
-          <button
-            id="delete-selected-button"
-            className="btn btn-danger btn-sm ml-2"
-            onClick={handleDeleteSelected}
-          >
-            Delete Selected
-          </button>
-        </div>
-        <div className="col-md-4">
-          <div className="form-group">
+      <div className=".container Search">
+        <div className="row">
+          <div className="col-md-7">
+            <button
+              id="delete-selected-button"
+              className="btn btn-danger btn-sm ml-2"
+              onClick={handleDeleteSelected}
+            >
+              Delete Selected
+            </button>
+          </div>
+          <div className="col-md-5">
             <input
               type="text"
               id="search-bar"
@@ -57,6 +126,7 @@ function SellerBookList() {
             />
           </div>
         </div>
+        <div className="form-group mt-3"></div>
       </div>
       <table className="table mt-4">
         <thead>
@@ -66,11 +136,8 @@ function SellerBookList() {
                 type="checkbox"
                 id="select-all-checkbox"
                 className="checkbox"
-                onChange={() => {
-                  // Handle select all logic
-                  // Update the selectedBooks state accordingly
-                  console.log('Select All');
-                }}
+                checked={selectedBooks.length === books.length}
+                onChange={() => handleCheckboxChange("all")}
               />
             </th>
             <th>ID</th>
@@ -84,7 +151,33 @@ function SellerBookList() {
           </tr>
         </thead>
         <tbody id="book-table-body">
-          {/* Map over your book data and render the rows */}
+          {books.map((book) => (
+            <tr key={book.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={selectedBooks.includes(book.id)}
+                  onChange={() => handleCheckboxChange(book.id)}
+                />
+              </td>
+              <td>{book.id}</td>
+              <td>{book.title}</td>
+              <td>{book.author}</td>
+              <td>{book.genre}</td>
+              <td>{book.description}</td>
+              <td>{book.price}</td>
+              <td>{book.quantity}</td>
+              <td>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => handleEditClick(book.id)}
+                >
+                  Edit
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

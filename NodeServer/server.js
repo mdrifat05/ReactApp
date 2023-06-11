@@ -111,6 +111,59 @@ app.post('/api/addBook', (req, res) => {
   });
 });
 
+app.get("/api/books", (req, res) => {
+  fs.readFile("BookData.json", "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to read book data." });
+    } else {
+      const books = JSON.parse(data);
+      const loggedSellerEmail = req.query.sellerEmail;
+      const filteredBooks = books.filter(
+        (book) => book.sellerEmail == loggedSellerEmail
+      );
+      res.json(filteredBooks);
+    }
+  });
+});
+
+app.delete('/api/books', (req, res) => {
+  const { bookIds } = req.body;
+
+  // Read existing data from the file
+  fs.readFile('BookData.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading data:', err);
+      res.status(500).json({ error: 'Error reading data' });
+    } else {
+      let bookList = [];
+
+      try {
+        // Parse the existing data as JSON
+        bookList = JSON.parse(data);
+      } catch (parseError) {
+        console.error('Error parsing data:', parseError);
+        res.status(500).json({ error: 'Error parsing data' });
+        return;
+      }
+
+      // Remove the selected books from the bookList array
+      bookList = bookList.filter((book) => !bookIds.includes(book.id));
+
+      // Save the updated data to the file
+      fs.writeFile('BookData.json', JSON.stringify(bookList), (writeErr) => {
+        if (writeErr) {
+          console.error('Error saving data:', writeErr);
+          res.status(500).json({ error: 'Error saving data' });
+        } else {
+          console.log('Books deleted from BookData.json');
+          res.json({ message: 'Books deleted successfully' });
+        }
+      });
+    }
+  });
+});
+
   app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
