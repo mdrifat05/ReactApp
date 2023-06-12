@@ -7,7 +7,7 @@ function AddBooks() {
   const sellerEmail = localStorage.getItem('LoggedSellerEmail'); 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    id: Math.floor(Math.random() * 10000),
+    id: Date.now(),
     title: '',
     author: '',
     genre: '',

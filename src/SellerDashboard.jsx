@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from 'react-router-dom';
+
 
 function SellerBookList() {
   const [selectedBooks, setSelectedBooks] = useState([]);
@@ -31,7 +33,7 @@ function SellerBookList() {
   const handleDeleteSelected = async () => {
     try {
       // Send a DELETE request to the backend API with the selected book IDs
-      const response = await fetch("http://localhost:3000/api/books", {
+      const response = await fetch("http://localhost:3000/api/books/delete", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -61,10 +63,12 @@ function SellerBookList() {
     setSearchQuery(event.target.value);
   };
 
+  const navigate = useNavigate();
   const handleEditClick = (bookId) => {
     console.log("Edit clicked for book ID:", bookId);
-    // Implement the logic for handling the Edit action for the respective book
+    navigate(`/UpdateBook/${bookId}`);
   };
+  
 
   useEffect(() => {
     // Fetch the book data from the backend API
@@ -102,7 +106,7 @@ function SellerBookList() {
   return (
     <div className="container mt-4">
       <div className="Delete">
-        <h1>Books</h1>
+        <h1 className="header-margin">Book List</h1>
       </div>
       <div className=".container Search">
         <div className="row">
@@ -173,7 +177,7 @@ function SellerBookList() {
                   className="btn btn-primary btn-sm"
                   onClick={() => handleEditClick(book.id)}
                 >
-                  Edit
+                  Update
                 </button>
               </td>
             </tr>

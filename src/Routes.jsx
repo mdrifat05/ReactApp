@@ -7,6 +7,7 @@ import SellerProfile from './seller-profile';
 import AddBook from './AddBook';
 import SellerDashboard from './SellerDashboard';
 import CustomerDashboard from './CustomerDashboard';
+import UpdateBook from './UpdateBook';
 
 function Routing() {
   return (
@@ -19,6 +20,7 @@ function Routing() {
         <Route path="/AddBook" element={<AddBook />}/>
         <Route path="SellerDashboard" element={<SellerDashboard />}/>
         <Route path="CustomerDashboard" element={<CustomerDashboard />}/>
+        <Route path="/UpdateBook/:bookId" element={<UpdateBook />} />
       </Routes>
     </>
   );

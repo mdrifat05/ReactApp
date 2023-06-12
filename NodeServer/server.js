@@ -127,7 +127,7 @@ app.get("/api/books", (req, res) => {
   });
 });
 
-app.delete('/api/books', (req, res) => {
+app.delete('/api/books/delete', (req, res) => {
   const { bookIds } = req.body;
 
   // Read existing data from the file
@@ -163,6 +163,48 @@ app.delete('/api/books', (req, res) => {
     }
   });
 });
+
+// GET /api/books/:bookId
+app.get('/api/books/:bookId', (req, res) => {
+  const { bookId } = req.params;
+  const bookData = JSON.parse(fs.readFileSync('BookData.json'));
+
+  const book = bookData.find((book) => book.id == parseInt(bookId));
+
+  if (book) {
+    res.json(book);
+  } else {
+    res.status(404).json({ error: 'Book not found' });
+  }
+});
+
+// POST /api/update/:bookId
+app.post('/api/update/:bookId', (req, res) => {
+  const { bookId } = req.params;
+  const updatedBookData = req.body;
+
+  // Read the book data from BookData.json
+  const bookData = JSON.parse(fs.readFileSync('BookData.json'));
+
+  // Find the book to be updated
+  const bookIndex = bookData.findIndex((book) => book.id == parseInt(bookId));
+
+  if (bookIndex !== -1) {
+    // Update the book data
+    bookData[bookIndex] = {
+      ...bookData[bookIndex],
+      ...updatedBookData
+    };
+
+    // Save the updated book data back to BookData.json
+    fs.writeFileSync('BookData.json', JSON.stringify(bookData, null, 2));
+
+    res.json({ message: 'Book updated successfully' });
+  } else {
+    res.status(404).json({ error: 'Book not found' });
+  }
+});
+
 
   app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
