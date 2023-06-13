@@ -44,7 +44,6 @@ app.post('/api/saveSellerData', (req, res) => {
     });
   });
   
-
   // Endpoint for login
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
@@ -205,6 +204,30 @@ app.post('/api/update/:bookId', (req, res) => {
   }
 });
 
+app.get('/api/GetSellerProfile', (req, res) => {
+  // Read the loggedSellerEmail from the request headers
+  const loggedSellerEmail = req.headers['loggedselleremail'];
+
+  // Read the JSON file data
+  fs.readFile('RegistrationData.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Parse the JSON data
+    const profiles = JSON.parse(data);
+
+    // Find the profile based on the loggedSellerEmail
+    const profile = profiles.find((p) => p.email === loggedSellerEmail);
+
+    if (!profile) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    return res.json(profile);
+  });
+});
 
   app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

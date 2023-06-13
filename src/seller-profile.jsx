@@ -1,6 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 function SellerProfile() {
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const loggedSellerEmail = localStorage.getItem('LoggedSellerEmail');
+
+    fetch('http://localhost:3000/api/GetSellerProfile', {
+      headers: {
+        loggedselleremail: loggedSellerEmail,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setProfile(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
   return (
     <div className="container">
       <div className="row">
@@ -10,27 +29,33 @@ function SellerProfile() {
               <h2>Seller Profile</h2>
             </div>
             <div className="card-body">
-              <p>
-                <strong>Name:</strong> <span id="name"></span>
-              </p>
-              <p>
-                <strong>Store Name:</strong> <span id="shopname"></span>
-              </p>
-              <p>
-                <strong>Email:</strong> <span id="email"></span>
-              </p>
-              <p>
-                <strong>Gender:</strong> <span id="gender"></span>
-              </p>
-              <p>
-                <strong>Phone:</strong> <span id="phone"></span>
-              </p>
-              <p>
-                <strong>Address:</strong> <span id="address"></span>
-              </p>
-              <p>
-                <strong>Join Date:</strong> <span id="joindate"></span>
-              </p>
+              {profile ? (
+                <>
+                  <p>
+                    <strong>Name:</strong> <span id="name">{profile.name}</span>
+                  </p>
+                  <p>
+                    <strong>Store Name:</strong> <span id="shopname">{profile.shopname}</span>
+                  </p>
+                  <p>
+                    <strong>Email:</strong> <span id="email">{profile.email}</span>
+                  </p>
+                  <p>
+                    <strong>Gender:</strong> <span id="gender">{profile.gender}</span>
+                  </p>
+                  <p>
+                    <strong>Phone:</strong> <span id="phone">{profile.phone}</span>
+                  </p>
+                  <p>
+                    <strong>Address:</strong> <span id="address">{profile.address}</span>
+                  </p>
+                  <p>
+                    <strong>Join Date:</strong> <span id="joindate">{profile.joined}</span>
+                  </p>
+                </>
+              ) : (
+                <p>Loading...</p>
+              )}
             </div>
           </div>
         </div>
