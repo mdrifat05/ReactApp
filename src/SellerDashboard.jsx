@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import Pagination from "./Pagination";
 
+const itemsPerPage = 1; // Number of items to display per page
 
 function SellerBookList() {
   const [selectedBooks, setSelectedBooks] = useState([]);
@@ -10,6 +12,9 @@ function SellerBookList() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentBooks, setCurrentBooks] = useState([]);
+  const [totalPageCount, setTotalPageCount] = useState(0);
 
   const handleCheckboxChange = (bookId) => {
     if (bookId === "all") {
@@ -52,6 +57,11 @@ function SellerBookList() {
   
       // Clear the selectedBooks state
       setSelectedBooks([]);
+      
+      // Recalculate the new totalPageCount based on the remaining books
+      const remainingBookCount = books.length - selectedBooks.length;
+      const newTotalPageCount = Math.ceil(remainingBookCount / itemsPerPage);
+      setTotalPageCount(newTotalPageCount);
     } catch (error) {
       console.error("Error deleting books:", error);
       setError("Failed to delete books. Please try again later.");
@@ -61,6 +71,7 @@ function SellerBookList() {
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
+    setCurrentPage(1); // Reset current page when the search query changes
   };
 
   const navigate = useNavigate();
@@ -68,32 +79,60 @@ function SellerBookList() {
     console.log("Edit clicked for book ID:", bookId);
     navigate(`/UpdateBook/${bookId}`);
   };
-  
+
+  const fetchBooks = async (page) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/books?sellerEmail=${localStorage.LoggedSellerEmail}&page=${page}&limit=${itemsPerPage}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch books.");
+      }
+
+      const responseData = await response.json();
+      console.log("Data:", responseData);
+
+      setBooks(responseData);
+      console.log("Books:", books);
+
+      const totalDataCount = responseData.length;
+
+
+      const pageCount = Math.ceil(totalDataCount / itemsPerPage);
+      setTotalPageCount(pageCount);
+
+      console.log("Total page count:", totalPageCount);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      setError("Failed to fetch books. Please try again later.");
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Fetch the book data from the backend API
-    const fetchBooks = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/books?sellerEmail=${localStorage.LoggedSellerEmail}`
-        );
+    fetchBooks(currentPage);
+  }, [currentPage, itemsPerPage]);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch books.");
-        }
+  useEffect(() => {
+    // Calculate current books based on pagination
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentBooks = books.slice(startIndex, endIndex);
+    console.log("Current books:", currentBooks);
+    console.log("books:", books);
+    setCurrentBooks(currentBooks);
+  }, [books, currentPage]);
 
-        const data = await response.json();
-        setBooks(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching books:", error);
-        setError("Failed to fetch books. Please try again later.");
-        setLoading(false);
-      }
-    };
-
-    fetchBooks();
-  }, []);
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPageCount) {
+      setCurrentPage(page);
+      console.log("Current page:", page);
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -140,7 +179,7 @@ function SellerBookList() {
                 type="checkbox"
                 id="select-all-checkbox"
                 className="checkbox"
-                checked={selectedBooks.length === books.length}
+                // checked={selectedBooks.length === books.length}
                 onChange={() => handleCheckboxChange("all")}
               />
             </th>
@@ -155,7 +194,7 @@ function SellerBookList() {
           </tr>
         </thead>
         <tbody id="book-table-body">
-          {books.map((book) => (
+          {currentBooks.map((book) => (
             <tr key={book.id}>
               <td>
                 <input
@@ -184,6 +223,12 @@ function SellerBookList() {
           ))}
         </tbody>
       </table>
+      <Pagination
+        currentPage={currentPage}
+        totalPageCount={totalPageCount}
+        itemsPerPage={itemsPerPage}
+        handlePageChange={handlePageChange}
+      />
     </div>
   );
 }

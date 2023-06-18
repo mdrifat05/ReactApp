@@ -4,6 +4,7 @@ import NavBar from './NavBar';
 import Footer from './Footer';
 import Routes from './Routes';
 import './App.css';
+import Pagination from './Pagination';
 
 
 function App() {

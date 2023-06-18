@@ -3,7 +3,8 @@ const fs = require('fs');
 const cors = require('cors'); // Import the cors package
 const app = express();
 const port = 3000;
-
+const { promisify } = require("util");
+const readFileAsync = promisify(fs.readFile);
 app.use(cors()); // Use the cors middleware
 
 app.use(express.json());
@@ -110,21 +111,66 @@ app.post('/api/addBook', (req, res) => {
   });
 });
 
-app.get("/api/books", (req, res) => {
-  fs.readFile("BookData.json", "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to read book data." });
-    } else {
-      const books = JSON.parse(data);
-      const loggedSellerEmail = req.query.sellerEmail;
-      const filteredBooks = books.filter(
-        (book) => book.sellerEmail == loggedSellerEmail
-      );
-      res.json(filteredBooks);
-    }
-  });
+
+
+app.get("/api/books", async (req, res) => {
+  try {
+    const data = await readFileAsync("BookData.json", "utf8");
+    const books = JSON.parse(data);
+    const loggedSellerEmail = req.query.sellerEmail;
+    const filteredBooks = books.filter(
+      (book) => book.sellerEmail === loggedSellerEmail
+    );
+    res.json(filteredBooks);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to read book data." });
+  }
 });
+
+// app.get("/api/books", async (req, res) => {
+//   try {
+//     const data = await readFileAsync("BookData.json", "utf8");
+//     const books = JSON.parse(data);
+//     const loggedSellerEmail = req.query.sellerEmail;
+//     const filteredBooks = books.filter(
+//       (book) => book.sellerEmail === loggedSellerEmail
+//     );
+
+//     // Get the query parameters for pagination
+//     let { page, limit } = req.query;
+
+//     // Convert the page and limit parameters to numbers (default to 1 and 5 if not provided)
+//     page = parseInt(page) || 1;
+//     limit = parseInt(limit) || 5;
+
+//     // Print a message if page 2 is requested
+//     if (page === 2) {
+//       console.log("Page 2 was requested!");
+//     }
+
+//     // Calculate the startIndex and endIndex based on the page and limit values
+//     const startIndex = (page - 1) * limit;
+//     const endIndex = page * limit;
+
+//     // Slice the filtered books based on the pagination parameters
+//     const paginatedBooks = filteredBooks.slice(startIndex, endIndex);
+
+//     // Calculate the total data count
+//     const totalDataCount = filteredBooks.length;
+
+//     res.json({
+//       totalDataCount,
+//       data: paginatedBooks,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Failed to read book data." });
+//   }
+// });
+
+
+
 
 app.delete('/api/books/delete', (req, res) => {
   const { bookIds } = req.body;
