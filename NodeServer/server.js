@@ -118,15 +118,30 @@ app.get("/api/books", async (req, res) => {
     const data = await readFileAsync("BookData.json", "utf8");
     const books = JSON.parse(data);
     const loggedSellerEmail = req.query.sellerEmail;
-    const filteredBooks = books.filter(
+    const searchQuery = req.query.searchQuery;
+    let filteredBooks = books.filter(
       (book) => book.sellerEmail === loggedSellerEmail
     );
+
+    // Search by book title or author
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filteredBooks = filteredBooks.filter(
+        (book) =>
+          book.title.toLowerCase().includes(query) ||
+          book.author.toLowerCase().includes(query)||
+          book.genre.toLowerCase().includes(query) ||
+          price.includes(query)
+         );
+    }
+
     res.json(filteredBooks);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to read book data." });
   }
 });
+
 
 // app.get("/api/books", async (req, res) => {
 //   try {

@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import Pagination from "./Pagination";
 
-const itemsPerPage = 1; // Number of items to display per page
+const itemsPerPage = 2; // Number of items to display per page
 
 function SellerBookList() {
   const [selectedBooks, setSelectedBooks] = useState([]);
@@ -70,7 +70,8 @@ function SellerBookList() {
   
 
   const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+    const query = event.target.value;
+    setSearchQuery(query);
     setCurrentPage(1); // Reset current page when the search query changes
   };
 
@@ -80,10 +81,10 @@ function SellerBookList() {
     navigate(`/UpdateBook/${bookId}`);
   };
 
-  const fetchBooks = async (page) => {
+  const fetchBooks = async (page, searchQuery) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/books?sellerEmail=${localStorage.LoggedSellerEmail}&page=${page}&limit=${itemsPerPage}`
+        `http://localhost:3000/api/books?sellerEmail=${localStorage.LoggedSellerEmail}&searchQuery=${searchQuery}`
       );
 
       if (!response.ok) {
@@ -114,8 +115,8 @@ function SellerBookList() {
 
   useEffect(() => {
     // Fetch the book data from the backend API
-    fetchBooks(currentPage);
-  }, [currentPage, itemsPerPage]);
+    fetchBooks(1, searchQuery);
+  }, [currentPage, itemsPerPage, searchQuery]);
 
   useEffect(() => {
     // Calculate current books based on pagination
@@ -163,7 +164,7 @@ function SellerBookList() {
               type="text"
               id="search-bar"
               className="form-control search"
-              placeholder="Search by book title"
+              placeholder="Search book "
               value={searchQuery}
               onChange={handleSearchChange}
             />

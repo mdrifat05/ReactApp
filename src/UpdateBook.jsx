@@ -77,7 +77,7 @@ function UpdateBookForm() {
 
   return (
     <div className="container">
-      <h1>Update Book</h1>
+      <h1 className="form-group">Update Book</h1>
       {bookData ? (
         <form id="updateBookForm" onSubmit={handleSubmit}>
           <div className="form-group">
