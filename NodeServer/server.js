@@ -131,7 +131,7 @@ app.get("/api/books", async (req, res) => {
           book.title.toLowerCase().includes(query) ||
           book.author.toLowerCase().includes(query)||
           book.genre.toLowerCase().includes(query) ||
-          price.includes(query)
+          book.price.includes(query)
          );
     }
 
